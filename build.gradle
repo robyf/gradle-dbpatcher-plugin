@@ -4,6 +4,56 @@ wrapper {
     gradleVersion = '3.1'
 }
 
+group = 'net.robyf'
+archivesBaseName = 'gradle-dbpatcher-plugin'
+
+ext.majorVersion = 1
+ext.minorVersion = 0
+
+def computeVersionNumber() {
+    def computedVersion
+    ext.env = System.getenv()
+    ext.branchName = env.BRANCH_NAME
+    if (ext.branchName == "master") {
+        ext.buildNumber = env.BUILD_NUMBER?.toInteger()
+        computedVersion = "${majorVersion}.${minorVersion}.${buildNumber}"
+    } else {
+        computedVersion = "${majorVersion}.${minorVersion}-SNAPSHOT"
+    }
+    return computedVersion
+}
+
+version = computeVersionNumber()
+ext.isSnapshot = version.endsWith("SNAPSHOT")
+
+if ( isSnapshot ) {
+    println "Using snapshot repository for artifact uploads"
+    ext.mavenCentralUploadUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+} else {
+    println "Using staging repository for artifact uploads"
+    ext.mavenCentralUploadUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+}
+
+configurations {
+    archives
+}
+
+task sourceJar(type: Jar) {
+    description = "An archive of the source code for Maven Central"
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task groovydocJar(type: Jar) {
+    description = "An archive of the GroovyDocs for Maven Central"
+    classifier = 'javadoc'
+    from groovydoc
+}
+
+artifacts {
+    archives jar, groovydocJar, sourceJar
+}
+
 repositories {
     jcenter()
 }

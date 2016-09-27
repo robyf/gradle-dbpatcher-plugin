@@ -1,6 +1,7 @@
 package net.robyf.dbpatcher.gradle
 
 import java.lang.ClassLoader
+import java.lang.reflect.Method
 import java.net.URLClassLoader
 import java.nio.charset.Charset
 
@@ -30,15 +31,18 @@ class DBPatcher extends DefaultTask {
         ClassLoader threadLoader = Thread.currentThread().getContextClassLoader()
    
         try {
+            def path
             if (classpath) {
-                def urls = classpath.collect { it.toURI().toURL() }
-                ClassLoader newLoader = new URLClassLoader(urls as URL[], threadLoader)
-                Thread.currentThread().setContextClassLoader(newLoader)
+                path = classpath
+            } else {
+                path = project.configurations.dbpatcher
             }
-        
-            println "Patching"
+            def urls = path.collect { it.toURI().toURL() }
+            ClassLoader newLoader = new URLClassLoader(urls as URL[], threadLoader)
+            Thread.currentThread().setContextClassLoader(newLoader)
             
-            Parameters params = new Parameters()
+            Class paramsClass = Thread.currentThread().getContextClassLoader().loadClass("net.robyf.dbpatcher.Parameters")
+            Object params = paramsClass.getConstructor().newInstance()
             if (configuration == null) {
                 params.setUsername(username)
                 params.setPassword(password)
@@ -53,7 +57,6 @@ class DBPatcher extends DefaultTask {
                     params.setCharset(Charset.defaultCharset())
                 }
             } else {
-                println "Using configuration"
                 params.setUsername(configuration.username)
                 params.setPassword(configuration.password)
                 params.setDatabaseName(configuration.database)
@@ -66,6 +69,7 @@ class DBPatcher extends DefaultTask {
                 } else {
                     params.setCharset(Charset.defaultCharset())
                 }
+
             }
             
             if (params.getUsername() == null) {
@@ -80,16 +84,10 @@ class DBPatcher extends DefaultTask {
             if (params.getSchemaPath() == null) {
                 throw new NullPointerException("Schema root cannot be null");
             }
-            println "Username: " + params.getUsername()
-            println "Password: " + params.getPassword()
-            println "Database: " + params.getDatabaseName()
-            println "Schema root: " + params.getSchemaPath()
-            println "Version: " + params.getTargetVersion()
-            println "Rollback if error: " + params.rollbackIfError()
-            println "Simulation mode: " + params.isSimulationMode()
-            println "Charset: " + params.getCharset()
             
-            new DBPatcherFactory().getDBPatcher().patch(params)
+            Class factory = Thread.currentThread().getContextClassLoader().loadClass("net.robyf.dbpatcher.DBPatcherFactory")
+            Method patcher = factory.getMethod("getDBPatcher")
+            patcher.invoke(null).patch(params)
          } finally {
             Thread.currentThread().setContextClassLoader(threadLoader)
          }

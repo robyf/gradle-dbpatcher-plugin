@@ -24,6 +24,7 @@ class DBPatcher extends DefaultTask {
     Long targetVersion
     boolean rollbackIfError
     boolean simulationMode
+    boolean insecureMode
     String charset
 
     @TaskAction
@@ -51,6 +52,7 @@ class DBPatcher extends DefaultTask {
                 params.setTargetVersion(targetVersion)
                 params.setRollbackIfError(rollbackIfError)
                 params.setSimulationMode(simulationMode)
+                params.setInsecureMode(insecureMode)
                 if (charset) {
                     params.setCharset(Charset.forName(charset))
                 } else {
@@ -64,6 +66,7 @@ class DBPatcher extends DefaultTask {
                 params.setTargetVersion(configuration.targetVersion)
                 params.setRollbackIfError(configuration.rollbackIfError)
                 params.setSimulationMode(configuration.simulationMode)
+                params.setInsecureMode(configuration.insecureMode)
                 if (configuration.charset) {
                     params.setCharset(Charset.forName(configuration.charset))
                 } else {

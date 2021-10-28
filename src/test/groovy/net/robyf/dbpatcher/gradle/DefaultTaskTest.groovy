@@ -1,22 +1,22 @@
 package net.robyf.dbpatcher.gradle
 
-import java.nio.charset.Charset
-
 import net.robyf.dbpatcher.DBPatcherFactory
-
 import org.gradle.api.Project
-import org.gradle.api.tasks.TaskExecutionException
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TemporaryFolder
 
-import static org.junit.Assert.assertEquals
-import static org.junit.Assert.assertFalse
-import static org.junit.Assert.assertNull
-import static org.junit.Assert.assertTrue
+import java.nio.charset.Charset
+
+import static org.junit.Assert.*
 
 class DefaultTaskTest {
+
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
 
     Project project
 
@@ -31,53 +31,53 @@ class DefaultTaskTest {
         DBPatcherFactory.reset()
     }
 
-    @Test (expected = TaskExecutionException.class)
+    @Test (expected = NullPointerException.class)
     void missingUsername() {
         project.dbpatcher.password = 'x'
         project.dbpatcher.database = 'x'
         project.dbpatcher.schemaRoot = 'x'
-        
-        project.tasks.dbpatcher.execute()
+
+        project.tasks.dbpatcher.patch()
     }
 
-    @Test (expected = TaskExecutionException.class)
+    @Test (expected = NullPointerException.class)
     void missingPassword() {
         project.dbpatcher.username = 'x'
         project.dbpatcher.database = 'x'
         project.dbpatcher.schemaRoot = 'x'
-        
-        project.tasks.dbpatcher.execute()
+
+        project.tasks.dbpatcher.patch()
     }
 
-    @Test (expected = TaskExecutionException.class)
+    @Test (expected = NullPointerException.class)
     void missingDatabase() {
         project.dbpatcher.username = 'x'
         project.dbpatcher.password = 'x'
         project.dbpatcher.schemaRoot = 'x'
-        
-        project.tasks.dbpatcher.execute()
+
+        project.tasks.dbpatcher.patch()
     }
 
-    @Test (expected = TaskExecutionException.class)
+    @Test (expected = NullPointerException.class)
     void missingSchemaRoot() {
         project.dbpatcher.username = 'x'
         project.dbpatcher.password = 'x'
         project.dbpatcher.database = 'x'
-        
-        project.tasks.dbpatcher.execute()
+
+        project.tasks.dbpatcher.patch()
     }
 
     @Test
     void executePluginWithMandatoryParametersOnly() {
         def mock = new MockDBPatcher()
         DBPatcherFactory.setDBPatcher(mock)
-    
+
         project.dbpatcher.username = 'x'
         project.dbpatcher.password = 'y'
         project.dbpatcher.database = 'z'
         project.dbpatcher.schemaRoot = 'w'
-        
-        project.tasks.dbpatcher.execute()
+
+        project.tasks.dbpatcher.patch()
         
         assertTrue("DBPatcher not invoked", mock.wasInvoked())
         
@@ -88,6 +88,7 @@ class DefaultTaskTest {
         assertNull("Target version", mock.getParams().getTargetVersion())
         assertFalse("Rollback if error", mock.getParams().rollbackIfError())
         assertFalse("Simulation mode", mock.getParams().isSimulationMode())
+        assertFalse("Insecure mode", mock.getParams().isInsecureMode())
         assertEquals("Charset", Charset.defaultCharset(), mock.getParams().getCharset())
     }
 
@@ -103,9 +104,10 @@ class DefaultTaskTest {
         project.dbpatcher.targetVersion = 25
         project.dbpatcher.rollbackIfError = true
         project.dbpatcher.simulationMode = true
+        project.dbpatcher.insecureMode = true
         project.dbpatcher.charset = 'ISO-8859-15'
         
-        project.tasks.dbpatcher.execute()
+        project.tasks.dbpatcher.patch()
         
         assertTrue("DBPatcher not invoked", mock.wasInvoked())
         
@@ -116,7 +118,20 @@ class DefaultTaskTest {
         assertEquals("Target version", project.dbpatcher.targetVersion, mock.getParams().getTargetVersion())
         assertTrue("Rollback if error", mock.getParams().rollbackIfError())
         assertTrue("Simulation mode", mock.getParams().isSimulationMode())
+        assertTrue("Insecure mode", mock.getParams().isInsecureMode())
         assertEquals("Charset", Charset.forName(project.dbpatcher.charset), mock.getParams().getCharset())
+    }
+
+    private void writeFile(File destination, String content) throws IOException {
+        BufferedWriter output = null;
+        try {
+            output = new BufferedWriter(new FileWriter(destination))
+            output.write(content)
+        } finally {
+            if (output != null) {
+                output.close()
+            }
+        }
     }
 
 }

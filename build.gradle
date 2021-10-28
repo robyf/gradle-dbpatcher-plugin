@@ -9,10 +9,15 @@ buildscript {
     }
 }
 
+plugins {
+    id "org.sonarqube" version "3.3"
+}
+
 apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'signing'
 apply plugin: "com.gradle.plugin-publish"
+apply plugin: 'jacoco'
 
 wrapper {
     gradleVersion = '5.6.4'
@@ -48,6 +53,14 @@ if ( isSnapshot ) {
     ext.mavenCentralUploadUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
 }
 
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+}
+
+test.finalizedBy(project.tasks.jacocoTestReport)
+
 configurations {
     archives
 }
@@ -77,6 +90,7 @@ dependencies {
     compile localGroovy()
     compile group: 'net.robyf', name: 'dbpatcher', version: '1.0.3'
     testCompile 'junit:junit:4.12'
+    testCompile gradleTestKit()
 }
 
 signing {
@@ -143,6 +157,12 @@ pluginBundle {
             id = 'net.robyf.dbpatcher'
             displayName = 'Dbpatcher Gradle plugin'
         }
+    }
+}
+
+sonarqube {
+    properties {
+        property "sonar.projectVersion", project.ext.sonarProjectVersion
     }
 }
 

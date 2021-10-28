@@ -15,7 +15,7 @@ apply plugin: 'signing'
 apply plugin: "com.gradle.plugin-publish"
 
 wrapper {
-    gradleVersion = '3.1'
+    gradleVersion = '5.6.4'
 }
 
 group = 'net.robyf'
@@ -145,3 +145,4 @@ pluginBundle {
         }
     }
 }
+

@@ -21,7 +21,7 @@ node {
     
     if (env.BRANCH_NAME == "master") {
         stage("Publish plugin") {
-            sh "./gradlew --info bintrayUpload publishPlugins"
+            sh "./gradlew --info publishPlugins"
         }
     }
 }

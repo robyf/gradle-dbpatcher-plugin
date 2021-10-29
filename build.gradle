@@ -48,9 +48,11 @@ ext.isSnapshot = version.endsWith("SNAPSHOT")
 if ( isSnapshot ) {
     println "Using snapshot repository for artifact uploads"
     ext.mavenCentralUploadUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+    ext.sonarProjectVersion = version + "-b" + env.BUILD_NUMBER
 } else {
     println "Using staging repository for artifact uploads"
     ext.mavenCentralUploadUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+    ext.sonarProjectVersion = version
 }
 
 jacocoTestReport {

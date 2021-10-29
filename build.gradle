@@ -166,7 +166,6 @@ sonarqube {
     properties {
         property "sonar.projectVersion", project.ext.sonarProjectVersion
         property "sonar.verbose", true
-        property "sonar.branch", project.ext.branchName
     }
 }
 

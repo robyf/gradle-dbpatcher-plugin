@@ -32,7 +32,7 @@ class DBPatcherPlugin implements Plugin<PluginAware> {
         
         project.logger.info("Applying dbpatcher plugin to ${project.name}")
         
-        def extension = project.extensions.create('dbpatcher', DBPatcherExtension)
+        project.extensions.create('dbpatcher', DBPatcherExtension)
         if (!project.configurations.asMap["dbpatcher"]) {
             project.configurations.create("dbpatcher")
             project.afterEvaluate {

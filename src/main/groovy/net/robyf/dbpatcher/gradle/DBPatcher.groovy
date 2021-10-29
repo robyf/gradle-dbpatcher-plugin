@@ -1,16 +1,11 @@
 package net.robyf.dbpatcher.gradle
 
-import java.lang.ClassLoader
-import java.lang.reflect.Method
-import java.net.URLClassLoader
-import java.nio.charset.Charset
-
-import net.robyf.dbpatcher.DBPatcherFactory
-import net.robyf.dbpatcher.Parameters
-
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.tasks.TaskAction
+
+import java.lang.reflect.Method
+import java.nio.charset.Charset
 
 class DBPatcher extends DefaultTask {
 

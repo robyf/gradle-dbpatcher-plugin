@@ -30,7 +30,7 @@ class AdditionalTaskTest {
         DBPatcherFactory.reset()
     }
 
-    @Test (expected = NullPointerException.class)
+    @Test (expected = DBPatcherException.class)
     void missingUsername() {
         task.password = 'x'
         task.database = 'x'
@@ -39,7 +39,7 @@ class AdditionalTaskTest {
         task.patch()
     }
 
-    @Test (expected = NullPointerException.class)
+    @Test (expected = DBPatcherException.class)
     void missingPassword() {
         task.username = 'x'
         task.database = 'x'
@@ -48,7 +48,7 @@ class AdditionalTaskTest {
         task.patch()
     }
 
-    @Test (expected = NullPointerException.class)
+    @Test (expected = DBPatcherException.class)
     void missingDatabase() {
         task.username = 'x'
         task.password = 'x'
@@ -57,7 +57,7 @@ class AdditionalTaskTest {
         task.patch()
     }
 
-    @Test (expected = NullPointerException.class)
+    @Test (expected = DBPatcherException.class)
     void missingSchemaRoot() {
         task.username = 'x'
         task.password = 'x'

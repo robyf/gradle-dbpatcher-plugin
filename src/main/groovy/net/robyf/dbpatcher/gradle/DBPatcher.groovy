@@ -71,16 +71,16 @@ class DBPatcher extends DefaultTask {
             }
             
             if (params.getUsername() == null) {
-                throw new NullPointerException("Username cannot be null");
+                throw new DBPatcherException("Username cannot be null");
             }
             if (params.getPassword() == null) {
-                throw new NullPointerException("Password cannot be null");
+                throw new DBPatcherException("Password cannot be null");
             }
             if (params.getDatabaseName() == null) {
-                throw new NullPointerException("Database cannot be null");
+                throw new DBPatcherException("Database cannot be null");
             }
             if (params.getSchemaPath() == null) {
-                throw new NullPointerException("Schema root cannot be null");
+                throw new DBPatcherException("Schema root cannot be null");
             }
             
             Class factory = Thread.currentThread().getContextClassLoader().loadClass("net.robyf.dbpatcher.DBPatcherFactory")
